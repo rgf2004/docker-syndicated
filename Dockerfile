@@ -1,23 +1,12 @@
 FROM phusion/baseimage
-MAINTAINER Holger Schinzel <holger@dash.org>
 
-ARG USER_ID
-ARG GROUP_ID
+RUN apt-get update && apt-get install unzip
 
-ENV HOME /dash
-
-# add user with specified (or default) user/group ids
-ENV USER_ID ${USER_ID:-1000}
-ENV GROUP_ID ${GROUP_ID:-1000}
-RUN groupadd -g ${GROUP_ID} dash
-RUN useradd -u ${USER_ID} -g dash -s /bin/bash -m -d /dash dash
-
-RUN chown dash:dash -R /dash
-
-ADD https://github.com/dashpay/dash/releases/download/v0.12.2.3/dashcore-0.12.2.3-linux64.tar.gz /tmp/
-RUN tar -xvf /tmp/dashcore-*.tar.gz -C /tmp/
-RUN cp /tmp/dashcore*/bin/*  /usr/local/bin
-RUN rm -rf /tmp/dashcore*
+ADD https://github.com/SyndicateLtd/SyndicateQT/releases/download/v2.0.0/Syndicate-2.0.0-x86_64-linux-gnu.zip /tmp/
+RUN unzip /tmp/Syndicate-*.zip -d /tmp/
+RUN rm /tmp/*.zip
+RUN cp /tmp/*  /usr/local/bin
+RUN rm -rf /tmp/*
 
 ADD ./bin /usr/local/bin
 RUN chmod a+x /usr/local/bin/*
@@ -26,12 +15,7 @@ RUN chmod a+x /usr/local/bin/*
 # denied issues when executing /bin/bash from trusted builds.  Building locally
 # works fine (strange).  Using the upstream docker (0.11.1) pkg from
 # http://get.docker.io/ubuntu works fine also and seems simpler.
-USER dash
 
-VOLUME ["/dash"]
+EXPOSE 25992 25993
 
-EXPOSE 9998 9999 19998 19999
-
-WORKDIR /dash
-
-CMD ["dash_oneshot"]
+CMD  ["synx_oneshot"]

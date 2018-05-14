@@ -1,0 +1,34 @@
+#!/bin/bash
+
+set -ex
+
+# This shouldn't be in the Dockerfile or containers built from the same image
+# will have the same credentials.
+if [ ! -e "$HOME/.syndicate/syndicate.conf" ]; then
+    mkdir -p $HOME/.syndicate
+
+    echo "Creating syndicate.conf"
+
+    # Seed a random password for JSON RPC server
+    cat <<EOF > $HOME/.syndicate/syndicate.conf
+rpcuser=${RPCUSER:-synxrpc}
+rpcpassword=${RPCPASSWORD:-`dd if=/dev/urandom bs=33 count=1 2>/dev/null | base64`}
+rpcallowip=127.0.0.1
+#----
+listen=1
+server=1
+daemon=1
+logtimestamps=1
+maxconnections=256
+#-----------------
+addnode=45.76.61.67:25992
+addnode=217.72.87.70:25992
+addnode=45.32.222.55:25992
+addnode=108.61.215.254:25992
+EOF
+
+fi
+
+cat $HOME/.syndicate/syndicate.conf
+
+echo "Initialization completed successfully"
